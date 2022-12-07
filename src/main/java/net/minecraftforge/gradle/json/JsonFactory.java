@@ -51,8 +51,10 @@ public class JsonFactory {
             if (!parentFile.exists()) {
                 throw new FileNotFoundException("Inherited json file (" + v.inheritsFrom + ") not found! Maybe you are running in offline mode?");
             }
-            Version parent = loadVersion(new File(inheritanceDir, mcVersion + ".json"), mcVersion, inheritanceDir);
-            v.extendFrom(parent);
+            if (parentFile != json) {
+                Version parent = loadVersion(new File(inheritanceDir, mcVersion + ".json"), mcVersion, inheritanceDir);
+                v.extendFrom(parent);
+            }
         }
 
         return v;
