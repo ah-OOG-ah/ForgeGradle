@@ -1,4 +1,5 @@
 plugins {
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
     id 'java'
     id 'idea'
     id 'eclipse'
@@ -42,15 +43,28 @@ repositories {
         name 'mojang'
         url 'https://libraries.minecraft.net/'
     }
+    gradlePluginPortal()
 }
 
 jar {
+
+    from sourceSets.main.allSource
     manifest {
         attributes 'version': project.version, 'javaCompliance': project.targetCompatibility
         attributes 'group': project.group
         attributes 'Implementation-Version': project.version
     }
 }
+
+shadowJar {
+    baseName = rootProject.name
+    version = project.version
+}
+
+/*tasks.register('jarSources') {
+    from sourceSets.main.allSource
+    classifier = 'source'
+}*/
 
 configurations {
     compileOnly

@@ -24,4 +24,12 @@ public class AssetIndexRef
 {
     public String id, sha1, url;
     public int size, totalSize;
+
+    public AssetIndexRef(String id, String sha1, String url, int size, int totalSize) {
+        this.id = id;
+        this.sha1 = sha1;
+        this.url = url;
+        this.size = size;
+        this.totalSize = totalSize;
+    }
 }

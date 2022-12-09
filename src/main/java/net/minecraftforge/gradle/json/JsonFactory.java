@@ -7,16 +7,13 @@ import net.minecraftforge.gradle.json.LiteLoaderJson.VersionObject;
 import net.minecraftforge.gradle.json.version.AssetIndex;
 import net.minecraftforge.gradle.json.version.ManifestVersion;
 import net.minecraftforge.gradle.json.version.Version;
+import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 public class JsonFactory {
@@ -34,7 +31,7 @@ public class JsonFactory {
         GSON = builder.create();
     }
 
-    public static Version loadVersion(File json, String mcVersion, File inheritanceDir) throws JsonSyntaxException, JsonIOException, IOException {
+    public static Version loadVersion(File json, String mcVersion, File inheritanceDir, Logger log) throws JsonSyntaxException, JsonIOException, IOException {
         FileReader reader = new FileReader(json);
         Version v = GSON.fromJson(reader, Version.class);
         reader.close();
@@ -51,13 +48,34 @@ public class JsonFactory {
             if (!parentFile.exists()) {
                 throw new FileNotFoundException("Inherited json file (" + v.inheritsFrom + ") not found! Maybe you are running in offline mode?");
             }
-            if (parentFile != json) {
+
+            if (log != null) {
+
+                log.warn(json.toString());
+                log.warn(parentFile.toString());
+            }
+            if (!Objects.equals(parentFile.toString(), json.toString())) {
                 Version parent = loadVersion(new File(inheritanceDir, mcVersion + ".json"), mcVersion, inheritanceDir);
                 v.extendFrom(parent);
+            } else {
+
+                // Something borked and I'm slapping a dodgy patch on it
+                v.assetIndex = Version.dodgyAssetIndexPatch;
+
+                // Also patch downloads if needed
+                if (v.getDownloads() == null) {
+
+                    v.setDownloads(Version.downloads_patch);
+                }
             }
         }
 
         return v;
+    }
+
+    public static Version loadVersion(File json, String mcVersion, File inheritanceDir) throws JsonSyntaxException, JsonIOException, IOException  {
+
+        return loadVersion(json, mcVersion, inheritanceDir, null);
     }
 
     public static AssetIndex loadAssetsIndex(File json) throws JsonSyntaxException, JsonIOException, IOException {

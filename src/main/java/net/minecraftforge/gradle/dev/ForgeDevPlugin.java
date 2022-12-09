@@ -19,6 +19,7 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.java.archives.Manifest;
+import org.gradle.api.logging.LogLevel;
 import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.bundling.Zip;
 
@@ -65,7 +66,7 @@ public class ForgeDevPlugin extends DevBasePlugin {
 
         // the master setup task.
         Task task = makeTask("setupForge", DefaultTask.class);
-        task.dependsOn("extractForgeSources", "generateProjects", "eclipse", "copyAssets");
+        task.dependsOn("extractForgeSources", "generateProjects", "eclipse", "copyAssets"); // "eclipse",
         task.setGroup("Forge");
 
         // the master task.
@@ -260,6 +261,7 @@ public class ForgeDevPlugin extends DevBasePlugin {
     private void createEclipseTasks() {
         SubprojectTask task = makeTask("eclipseClean", SubprojectTask.class);
         {
+            task.getLogging().captureStandardOutput(LogLevel.INFO);
             task.setBuildFile(delayedFile(ECLIPSE_CLEAN + "/build.gradle"));
             task.setTasks("eclipse");
             task.dependsOn("extractMcSource", "generateProjects");

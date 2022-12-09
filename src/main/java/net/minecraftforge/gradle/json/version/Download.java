@@ -24,4 +24,10 @@ public class Download
 {
     String sha1, url;
     int size;
+
+    public Download(String sha1, String url, int size) {
+        this.sha1 = sha1;
+        this.url = url;
+        this.size = size;
+    }
 }

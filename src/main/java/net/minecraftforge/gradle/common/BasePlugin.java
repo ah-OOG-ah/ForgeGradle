@@ -25,6 +25,7 @@ import net.minecraftforge.gradle.tasks.ExtractConfigTask;
 import net.minecraftforge.gradle.tasks.ObtainFernFlowerTask;
 import net.minecraftforge.gradle.tasks.abstractutil.DownloadTask;
 import net.minecraftforge.gradle.tasks.abstractutil.EtagDownloadTask;
+import org.apache.logging.log4j.LogManager;
 import org.gradle.api.*;
 import org.gradle.api.artifacts.repositories.FlatDirectoryArtifactRepository;
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository;
@@ -380,11 +381,21 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
     }
 
     public static Project getProject(File buildFile, Project parent) {
+
         ProjectBuilder builder = ProjectBuilder.builder();
-        if (buildFile != null) {
+        if (buildFile != null && buildFile.getPath().contains("eclipse")) {
+
+            builder = builder.withProjectDir(buildFile.getParentFile())
+                    .withName(buildFile.getParentFile().getName());
+
+            System.out.println(buildFile);
+            System.out.println(builder.toString());
+        } else if (buildFile != null) {
+
             builder = builder.withProjectDir(buildFile.getParentFile())
                     .withName(buildFile.getParentFile().getName());
         } else {
+
             builder = builder.withProjectDir(new File("."));
         }
 

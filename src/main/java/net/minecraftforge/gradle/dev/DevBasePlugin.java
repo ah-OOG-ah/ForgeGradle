@@ -31,16 +31,14 @@ import org.gradle.api.Task;
 import org.gradle.api.file.FileTree;
 import org.gradle.api.file.FileVisitDetails;
 import org.gradle.api.file.FileVisitor;
+import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.bundling.Zip;
 import org.gradle.process.ExecSpec;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -288,7 +286,7 @@ public abstract class DevBasePlugin extends BasePlugin<DevExtension> {
             if (version == null) {
                 File jsonFile = devJson.call().getAbsoluteFile();
                 try {
-                    version = JsonFactory.loadVersion(jsonFile, delayedString("{MC_VERSION}").call(), jsonFile.getParentFile());
+                    version = JsonFactory.loadVersion(jsonFile, delayedString("{MC_VERSION}").call(), jsonFile.getParentFile(), project.getLogger());
                 } catch (Exception e) {
                     project.getLogger().error("" + jsonFile + " could not be parsed");
                     Throwables.propagate(e);
@@ -299,6 +297,15 @@ public abstract class DevBasePlugin extends BasePlugin<DevExtension> {
                 if (lib.natives != null) {
                     String path = lib.getPathNatives();
                     String taskName = "downloadNatives-" + lib.getArtifactName().split(":")[1];
+
+                    Logger log = project.getLogger();
+                    String taskNameFormatted = "task ':" + taskName + "'";
+
+                    if (project.getAllTasks(false).get(project).stream().anyMatch(task -> Objects.equals(task.toString(), taskNameFormatted))) {
+
+                        log.warn("Duplicate task registered! Appending \"-dupe\" to duplicate name and ignoring...");
+                        taskName += "-dupe";
+                    }
 
                     DownloadTask task = makeTask(taskName, DownloadTask.class);
                     {
