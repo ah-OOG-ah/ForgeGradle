@@ -36,7 +36,7 @@ import java.util.zip.ZipInputStream;
 
 public class ExtractS2SRangeTask extends DefaultTask {
     @InputFiles
-    private FileCollection libs;
+    private FileCollection libs = null;
     private DelayedFile projectFile; // to get classpath from a subproject
     private String projectConfig; // Also for a subProject
     private boolean includeJar = false; //Include the 'jar' task for subproject.

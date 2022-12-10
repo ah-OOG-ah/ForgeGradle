@@ -32,6 +32,7 @@ import java.util.List;
 import static net.minecraftforge.gradle.dev.DevConstants.*;
 
 public class ForgeDevPlugin extends DevBasePlugin {
+
     @Override
     public void applyPlugin() {
         super.applyPlugin();
@@ -66,12 +67,12 @@ public class ForgeDevPlugin extends DevBasePlugin {
 
         // the master setup task.
         Task task = makeTask("setupForge", DefaultTask.class);
-        task.dependsOn("extractForgeSources", "generateProjects", "eclipse", "copyAssets"); // "eclipse",
+        task.dependsOn("extractForgeSources", "generateProjects", "eclipse", "copyAssets");
         task.setGroup("Forge");
 
         // the master task.
         task = makeTask("buildPackages");
-        task.dependsOn("launch4j", "createChangelog", "packageUniversal", "packageInstaller", "packageUserDev", "packageSrc");
+        task.dependsOn("launch4j", "packageUniversal", "packageInstaller", "packageUserDev", "packageSrc");// ("launch4j", "createChangelog", "packageUniversal", "packageInstaller", "packageUserDev", "packageSrc");
         task.setGroup("Forge");
     }
 
@@ -278,6 +279,7 @@ public class ForgeDevPlugin extends DevBasePlugin {
     }
 
     private void createMiscTasks() {
+
         DelayedFile rangeMapClean = delayedFile("{BUILD_DIR}/tmp/rangemapCLEAN.txt");
         DelayedFile rangeMapDirty = delayedFile("{BUILD_DIR}/tmp/rangemapDIRTY.txt");
 
@@ -288,6 +290,7 @@ public class ForgeDevPlugin extends DevBasePlugin {
             extractRange.setExcOutput(delayedFile(EXC_MODIFIERS_DIRTY));
             extractRange.setRangeMap(rangeMapDirty);
         }
+        project.getLogger().info("extractRangeForge made!");
 
         ApplyS2STask applyS2S = makeTask("retroMapForge", ApplyS2STask.class);
         {
@@ -404,6 +407,7 @@ public class ForgeDevPlugin extends DevBasePlugin {
 
     @SuppressWarnings("serial")
     private void createPackageTasks() {
+
         CrowdinDownloadTask crowdin = makeTask("getLocalizations", CrowdinDownloadTask.class);
         {
             crowdin.setOutput(delayedFile(CROWDIN_ZIP));
@@ -471,7 +475,7 @@ public class ForgeDevPlugin extends DevBasePlugin {
                 }
             });
             uni.setDestinationDir(delayedFile("{BUILD_DIR}/distributions").call());
-            uni.dependsOn("genBinPatches", crowdin, makeChangelog, "createVersionPropertiesFML", vjson);
+            uni.dependsOn("genBinPatches", crowdin, "createVersionPropertiesFML", vjson);// ("genBinPatches", crowdin, makeChangelog, "createVersionPropertiesFML", vjson);
         }
         project.getArtifacts().add("archives", uni);
 
@@ -631,7 +635,7 @@ public class ForgeDevPlugin extends DevBasePlugin {
             src.from(delayedFile("{FML_DIR}/gradlew.bat"));
             src.from(delayedFile("{FML_DIR}/gradle/wrapper"), new CopyInto("gradle/wrapper"));
             src.rename(".+?\\.gradle", "build.gradle");
-            src.dependsOn(makeChangelog);
+            //src.dependsOn(makeChangelog);
             src.setExtension("zip");
         }
         project.getArtifacts().add("archives", src);

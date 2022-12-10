@@ -44,6 +44,8 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public abstract class DevBasePlugin extends BasePlugin<DevExtension> {
+
+    public static Map<Project, Set<String>> tasks = new HashMap<>();
     private AntPathMatcher antMatcher = new AntPathMatcher();
     protected static final String[] JAVA_FILES = new String[]{"**.java", "*.java", "**/*.java"};
 
@@ -298,15 +300,14 @@ public abstract class DevBasePlugin extends BasePlugin<DevExtension> {
                     String path = lib.getPathNatives();
                     String taskName = "downloadNatives-" + lib.getArtifactName().split(":")[1];
 
-                    Logger log = project.getLogger();
-                    String taskNameFormatted = "task ':" + taskName + "'";
+                    tasks.computeIfAbsent(project, k -> new HashSet<String>());
+                    if (tasks.get(project).contains(taskName)) {
 
-                    if (project.getAllTasks(false).get(project).stream().anyMatch(task -> Objects.equals(task.toString(), taskNameFormatted))) {
-
-                        log.warn("Duplicate task registered! Appending \"-dupe\" to duplicate name and ignoring...");
+                        project.getLogger().warn("Duplicate task registered! Appending \"-dupe\" to duplicate name and ignoring...");
                         taskName += "-dupe";
                     }
 
+                    DevBasePlugin.tasks.get(project).add(taskName);
                     DownloadTask task = makeTask(taskName, DownloadTask.class);
                     {
                         task.setOutput(delayedFile("{CACHE_DIR}/minecraft/" + path));

@@ -1,5 +1,4 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '4.0.4'
     id 'java'
     id 'idea'
     id 'eclipse'
@@ -55,16 +54,6 @@ jar {
         attributes 'Implementation-Version': project.version
     }
 }
-
-shadowJar {
-    baseName = rootProject.name
-    version = project.version
-}
-
-/*tasks.register('jarSources') {
-    from sourceSets.main.allSource
-    classifier = 'source'
-}*/
 
 configurations {
     compileOnly
